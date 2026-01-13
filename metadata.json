@@ -1,5 +1,5 @@
 {
-  "name": "Gerador de Prompts para Flow",
+  "name": "Gerador de Prompts para Flow 2",
   "description": "Crie scripts virais para TikTok Shop analisando imagens e vídeos de produtos.",
   "requestFramePermissions": [
     "camera"

@@ -1,29 +1,48 @@
 
 import React, { useState } from 'react';
+import { supabase } from '../services/supabaseClient';
 
-interface LoginCoverProps {
-  onLogin: () => void;
-}
-
-const LoginCover: React.FC<LoginCoverProps> = ({ onLogin }) => {
-  const [username, setUsername] = useState('');
+const LoginCover: React.FC = () => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isError, setIsError] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Revertendo para login simplificado
-    if (username.trim() && password.trim()) {
-      onLogin();
-    } else {
-      setIsError(true);
-      setTimeout(() => setIsError(false), 2000);
+    setIsLoading(true);
+    setError(null);
+    setSuccessMsg(null);
+
+    try {
+      if (isSignUp) {
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin,
+          },
+        });
+        if (signUpError) throw signUpError;
+        setSuccessMsg('Verifique seu e-mail para confirmar o cadastro!');
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (signInError) throw signInError;
+      }
+    } catch (err: any) {
+      setError(err.message || 'Erro ao processar autenticação.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden px-4">
-      {/* Background Decorativo */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#fe2c55]/20 rounded-full blur-[120px] animate-pulse"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#25f4ee]/10 rounded-full blur-[120px] animate-pulse"></div>
 
@@ -35,19 +54,20 @@ const LoginCover: React.FC<LoginCoverProps> = ({ onLogin }) => {
             </svg>
           </div>
           <h1 className="text-4xl font-black italic tracking-tighter text-white">FLOW SHOP</h1>
-          <p className="text-gray-400 mt-2 font-medium tracking-wide">AMBIENTE DE CRIAÇÃO EXCLUSIVO</p>
+          <p className="text-gray-400 mt-2 font-medium tracking-wide uppercase">Ambiente de Criação Supabase</p>
         </div>
 
-        <div className={`bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2.5rem] shadow-2xl transition-all ${isError ? 'animate-shake border-red-500/50' : ''}`}>
+        <div className={`bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2.5rem] shadow-2xl transition-all ${error ? 'animate-shake border-red-500/50' : ''}`}>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 ml-1">Usuário</label>
+              <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 ml-1">E-mail</label>
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 text-white px-6 py-4 rounded-2xl focus:ring-2 focus:ring-[#fe2c55] outline-none transition-all placeholder-gray-600"
-                placeholder="Seu nome de usuário"
+                placeholder="exemplo@flow.com"
               />
             </div>
 
@@ -55,6 +75,7 @@ const LoginCover: React.FC<LoginCoverProps> = ({ onLogin }) => {
               <label className="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 ml-1">Senha</label>
               <input
                 type="password"
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 text-white px-6 py-4 rounded-2xl focus:ring-2 focus:ring-[#fe2c55] outline-none transition-all placeholder-gray-600"
@@ -62,26 +83,37 @@ const LoginCover: React.FC<LoginCoverProps> = ({ onLogin }) => {
               />
             </div>
 
+            {error && <p className="text-red-500 text-[10px] font-black uppercase text-center">{error}</p>}
+            {successMsg && <p className="text-green-500 text-[10px] font-black uppercase text-center">{successMsg}</p>}
+
             <button
               type="submit"
-              className="w-full bg-[#fe2c55] hover:bg-[#ff4d70] text-white font-black py-5 rounded-2xl transition-all active:scale-95 shadow-lg flex items-center justify-center space-x-2"
+              disabled={isLoading}
+              className={`w-full bg-[#fe2c55] hover:bg-[#ff4d70] text-white font-black py-5 rounded-2xl transition-all active:scale-95 shadow-lg flex items-center justify-center space-x-2 uppercase text-sm tracking-widest ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              <span>ACESSAR AMBIENTE</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+              {isLoading ? (
+                <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <span>{isSignUp ? 'Criar Conta' : 'Acessar Ambiente'}</span>
+              )}
             </button>
           </form>
 
           <div className="mt-8 text-center">
-            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">
-              Acesso restrito a parceiros Flow
-            </p>
+            <button 
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
+            >
+              {isSignUp ? 'Já possui conta? Faça login' : 'Ainda não tem conta? Registre-se'}
+            </button>
           </div>
         </div>
         
         <p className="mt-8 text-center text-gray-700 text-[10px] font-black uppercase tracking-widest">
-          Gerador de Prompts v2.0 • Ultra HD Engine
+          Supabase Sync v3.0 • Cloud Security Enabled
         </p>
       </div>
     </div>

@@ -1,5 +1,5 @@
 {
-  "name": "gerador-de-prompts-para-flow",
+  "name": "gerador-de-prompts-para-flow-2",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,6 +11,7 @@
   "dependencies": {
     "react-dom": "^19.2.3",
     "@google/genai": "^1.35.0",
+    "@supabase/supabase-js": "^2.48.1",
     "react": "^19.2.3"
   },
   "devDependencies": {
