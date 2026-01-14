@@ -20,48 +20,61 @@ const PromptOutput: React.FC<PromptOutputProps> = ({ content }) => {
 
   if (!content) return null;
 
+  const strategyMatch = content.match(/\[ESTRATÉGIA\]:? (.*)/);
+  const strategy = strategyMatch ? strategyMatch[1] : "Estratégia Flow Master";
+  
+  const cleanContent = content
+    .replace(/\[ESTRATÉGIA\]:? .*/, '')
+    .trim();
+
   return (
-    <div className="mt-8 bg-[#121212] rounded-3xl border border-gray-800 overflow-hidden animate-in slide-in-from-bottom-8 duration-700 shadow-2xl">
-      <div className="bg-[#1a1a1a] px-6 py-5 border-b border-gray-800 flex items-center justify-between">
+    <div className="mt-8 bg-black rounded-[3rem] border border-gray-900 overflow-hidden animate-in slide-in-from-bottom-8 duration-700 shadow-[0_40px_80px_rgba(254,44,85,0.15)]">
+      <div className="bg-gradient-to-r from-[#111] to-black px-8 py-7 border-b border-gray-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center">
-           <div className="w-8 h-8 bg-[#ff7a00] rounded-lg flex items-center justify-center mr-3 shadow-[0px_0px_10px_rgba(255,122,0,0.4)]">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+           <div className="w-12 h-12 bg-gradient-to-br from-[#fe2c55] to-[#ff7a00] rounded-2xl flex items-center justify-center mr-4 shadow-[0px_0px_25px_rgba(254,44,85,0.5)]">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
            </div>
            <div>
-             <h2 className="text-white font-black text-sm uppercase tracking-tighter">Roteiro Otimizado Flow</h2>
-             <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">3 Cenas • 24s Total</p>
+             <h2 className="text-white font-black text-lg uppercase tracking-tighter italic">Roteiro de Alta Conversão</h2>
+             <span className="text-[#25f4ee] text-[11px] font-black px-0 py-0.5 rounded-full uppercase tracking-[0.3em]">
+               {strategy}
+             </span>
            </div>
         </div>
         <button
           onClick={handleCopy}
-          className={`px-6 py-2 rounded-full text-xs font-black transition-all ${
-            copied ? 'bg-green-500 text-white' : 'bg-white text-black hover:bg-gray-200'
+          className={`px-10 py-4 rounded-2xl text-xs font-black transition-all uppercase tracking-widest ${
+            copied ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'bg-white text-black hover:bg-[#25f4ee] hover:text-black shadow-xl active:scale-95'
           }`}
         >
-          {copied ? 'COPIADO!' : 'COPIAR ROTEIRO'}
+          {copied ? 'COPIADO COM SUCESSO' : 'COPIAR MASTER SCRIPT'}
         </button>
       </div>
-      <div className="p-8">
+      
+      <div className="p-8 md:p-14">
         <div className="prose prose-invert max-w-none">
-          <div className="text-gray-300 whitespace-pre-wrap font-medium leading-relaxed italic border-l-4 border-[#fe2c55] pl-6 py-2">
-            {content}
+          <div className="text-gray-200 whitespace-pre-wrap font-medium leading-relaxed text-xl font-serif selection:bg-[#fe2c55] selection:text-white">
+            {cleanContent}
           </div>
         </div>
         
-        <div className="mt-8 grid grid-cols-3 gap-4 border-t border-gray-800 pt-6">
-           <div className="bg-[#1a1a1a] p-3 rounded-xl border border-gray-800 text-center">
-             <span className="block text-white text-[10px] font-black mb-1">CENA 1</span>
-             <span className="text-[#fe2c55] text-[10px] font-bold uppercase tracking-tighter">Hook/Story</span>
+        <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-gray-900 pt-10">
+           <div className="bg-[#0a0a0a] p-6 rounded-[2rem] border border-white/5 group hover:border-[#fe2c55]/30 transition-colors">
+             <div className="text-2xl mb-2">📖</div>
+             <span className="block text-[#fe2c55] text-[10px] font-black mb-1 uppercase tracking-widest">Ato 1</span>
+             <span className="text-white text-sm font-bold">História & Imersão</span>
            </div>
-           <div className="bg-[#1a1a1a] p-3 rounded-xl border border-gray-800 text-center">
-             <span className="block text-white text-[10px] font-black mb-1">CENA 2</span>
-             <span className="text-[#fe2c55] text-[10px] font-bold uppercase tracking-tighter">Escassez</span>
+           <div className="bg-[#0a0a0a] p-6 rounded-[2rem] border border-white/5 group hover:border-yellow-500/30 transition-colors">
+             <div className="text-2xl mb-2">⏳</div>
+             <span className="block text-yellow-500 text-[10px] font-black mb-1 uppercase tracking-widest">Ato 2</span>
+             <span className="text-white text-sm font-bold">Escassez Real</span>
            </div>
-           <div className="bg-[#1a1a1a] p-3 rounded-xl border border-gray-800 text-center">
-             <span className="block text-white text-[10px] font-black mb-1">CENA 3</span>
-             <span className="text-[#ff7a00] text-[10px] font-bold uppercase tracking-tighter">CTA Cart</span>
+           <div className="bg-[#0a0a0a] p-6 rounded-[2rem] border border-white/5 group hover:border-[#25f4ee]/30 transition-colors">
+             <div className="text-2xl mb-2">💰</div>
+             <span className="block text-[#25f4ee] text-[10px] font-black mb-1 uppercase tracking-widest">Ato 3</span>
+             <span className="text-white text-sm font-bold">CTA de Venda</span>
            </div>
         </div>
       </div>
